@@ -1,0 +1,162 @@
+import 'package:flutter/material.dart';
+import 'package:todo_app/src/bloc/bloc.dart';
+import 'package:todo_app/src/bloc/provider.dart';
+import 'package:todo_app/src/screen/home.dart';
+
+class LoginScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    Bloc bloc = Provider.of(context);
+
+    return Scaffold(
+      body: Container(
+        decoration: BoxDecoration(
+            gradient: LinearGradient(
+          begin: Alignment.topRight,
+          end: Alignment.bottomLeft,
+          stops: [0.1, 0.5, 0.7, 0.9],
+          colors: [
+            // Colors are easy thanks to Flutter's Colors class.
+            Colors.indigo[800],
+            Colors.indigo[700],
+            Colors.indigo[600],
+            Colors.indigo[400],
+          ],
+        )),
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              children: <Widget>[
+                Text(
+                  "Welcome To Khmer Todo",
+                  style: TextStyle(
+                      fontFamily: 'Raleway',
+                      fontSize: 26.0,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 30.0),
+                Text(
+                  "Login",
+                  style: TextStyle(
+                    fontSize: 24.0,
+                    color: Colors.white,
+                    fontFamily: 'Raleway',
+                  ),
+                ),
+                SizedBox(height: 20.0),
+                _buildEmailInput(bloc),
+                SizedBox(height: 8.0),
+                _buildPasswordInput(bloc),
+                SizedBox(height: 20.0),
+                _buildSubmitButton(context, bloc),
+                SizedBox(height: 8.0),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Text(
+                      "Don't have account? ",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    GestureDetector(
+                      onTap: () {},
+                      child: Text(
+                        "Sign up",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    )
+                  ],
+                )
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmailInput(Bloc bloc) {
+    return StreamBuilder(
+      stream: bloc.email,
+      builder: (context, snapshot) {
+        return TextField(
+          style: TextStyle(
+            color: Colors.white,
+          ),
+          onChanged: bloc.changeEmail,
+          keyboardType: TextInputType.emailAddress,
+          decoration: InputDecoration(
+            labelText: "Email",
+            prefixIcon: Icon(
+              Icons.email,
+              color: Colors.white,
+            ),
+            border: OutlineInputBorder(),
+            errorText: snapshot.error,
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildPasswordInput(Bloc bloc) {
+    return StreamBuilder(
+        stream: bloc.password,
+        builder: (context, snapshot) {
+          return TextField(
+            onChanged: bloc.changePassword,
+            obscureText: true,
+            style: TextStyle(
+              color: Colors.white,
+            ),
+            decoration: InputDecoration(
+              labelText: "Password",
+              prefixIcon: Icon(
+                Icons.lock,
+                color: Colors.white,
+              ),
+              border: OutlineInputBorder(),
+              errorText: snapshot.error,
+            ),
+          );
+        });
+  }
+
+  Widget _buildSubmitButton(BuildContext con, Bloc bloc) {
+    return SizedBox(
+      width: double.infinity,
+      height: 40.0,
+      child: StreamBuilder(
+        stream: bloc.submitValid,
+        builder: (context, snapshot) {
+          return RaisedButton(
+            color: Theme.of(context).accentColor,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16.0),
+            ),
+            textColor: Colors.white,
+            child: Text("Login"),
+            onPressed: !snapshot.hasData
+                ? null
+                : () {
+                    performLogin(bloc, context);
+                  },
+          );
+        },
+      ),
+    );
+  }
+}
+
+performLogin(Bloc bloc, BuildContext context) {
+  bool isValid = bloc.submit();
+  if (!isValid) {
+    print("Invalid");
+  } else {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => HomeScreen()),
+    );
+  }
+}
