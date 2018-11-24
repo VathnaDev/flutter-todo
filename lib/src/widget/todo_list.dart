@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:todo_app/src/model/todo.dart';
 
 class TodoList extends StatelessWidget {
@@ -108,7 +109,9 @@ class TodoList extends StatelessWidget {
                     ),
                   ],
                 ),
-                subtitle: Text(todo.todoTime.format(context)),
+                subtitle: Text(DateFormat.yMMMd().format(todo.todoDate) +
+                    " " +
+                    todo.todoTime.format(context)),
               ),
             ),
           ),

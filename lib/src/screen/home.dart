@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:todo_app/src/bloc/bloc.dart';
@@ -130,13 +131,30 @@ Widget _buildSummeryCard() {
   );
 }
 
+// Widget _buildListTodos(Bloc bloc) {
+//   return StreamBuilder(
+//     stream: bloc.todos,
+//     builder: (BuildContext context, AsyncSnapshot<List<Todo>> snapshot) {
+//       return Expanded(
+//         child: TodoList(
+//           todos: snapshot.data,
+//         ),
+//       );
+//     },
+//   );
+// }
+
 Widget _buildListTodos(Bloc bloc) {
   return StreamBuilder(
-    stream: bloc.todos,
-    builder: (BuildContext context, AsyncSnapshot<List<Todo>> snapshot) {
+    stream: Firestore.instance.collection("todos").snapshots(),
+    builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+      List<Todo> todos = List();
+      for (var i = 0; i < snapshot.data.documents.length; i++) {
+        todos.add(Todo.fromMap(snapshot.data.documents[i].data));
+      }
       return Expanded(
         child: TodoList(
-          todos: snapshot.data,
+          todos: todos,
         ),
       );
     },

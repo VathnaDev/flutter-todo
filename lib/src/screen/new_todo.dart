@@ -3,6 +3,8 @@ import 'package:intl/intl.dart';
 import 'package:todo_app/src/bloc/bloc.dart';
 import 'package:todo_app/src/bloc/provider.dart';
 import 'package:todo_app/src/model/todo.dart';
+import 'package:uuid/uuid.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class NewTodoScreen extends StatefulWidget {
   _NewTodoScreenState createState() => _NewTodoScreenState();
@@ -16,6 +18,8 @@ class _NewTodoScreenState extends State<NewTodoScreen> {
     "Free Time",
     "Other"
   ];
+  final CollectionReference todoCollection =
+      Firestore.instance.collection('todos');
 
   String todo = "";
   String desciption = "";
@@ -267,13 +271,25 @@ class _NewTodoScreenState extends State<NewTodoScreen> {
     return RaisedButton(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
       onPressed: () {
-        bloc.addTodo(Todo(todo, desciption, todoDate, todoTime, category,
-            priorityValue, "Phnom Penh"));
+        //Add Todos to Bloc
+        // bloc.addTodo(Todo(todo, desciption, todoDate, todoTime, category,
+        //     priorityValue, "Phnom Penh"));
+
+        //Add Todo to CloudFireStore
+        createTodo(Todo(Uuid().v4().toString(), todo, desciption, todoDate,
+            todoTime, category, priorityValue, "Phnom Penh"));
       },
       textColor: Colors.white,
       color: Theme.of(context).primaryColor,
       elevation: 10.0,
       child: Text("Save"),
     );
+  }
+
+  createTodo(Todo todo) async {
+    // Map<String, dynamic> newTodo = todo.toMap();
+    // newTodo['todoDate'] = todo.todoDate.millisecond;
+    // newTodo['todoTime'] = todo.todoTime.minute;
+    await Firestore.instance.collection('todos').add(todo.toMap());
   }
 }
