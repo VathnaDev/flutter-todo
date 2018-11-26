@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:todo_app/src/model/todo.dart';
+import 'package:uuid/uuid.dart';
 
 class TodoList extends StatelessWidget {
   final List<Todo> todos;
@@ -79,12 +80,13 @@ class TodoList extends StatelessWidget {
               ),
             ),
           ),
-          key: Key(todo.todo),
+          key: Key(Uuid().v1().toString()),
           onDismissed: (DismissDirection direction) {
             if (direction == DismissDirection.startToEnd) {
               onTodoSwipeToRight(todo);
             } else {
               onTodoSwipeToLeft(todo);
+              todos.remove(todo);
             }
           },
           child: InkWell(
@@ -93,7 +95,10 @@ class TodoList extends StatelessWidget {
             },
             child: Card(
               child: ListTile(
-                title: Text(todo.todo),
+                title: Text(
+                  todo.todo,
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.end,
@@ -110,7 +115,7 @@ class TodoList extends StatelessWidget {
                   ],
                 ),
                 subtitle: Text(DateFormat.yMMMd().format(todo.todoDate) +
-                    " " +
+                    " | " +
                     todo.todoTime.format(context)),
               ),
             ),

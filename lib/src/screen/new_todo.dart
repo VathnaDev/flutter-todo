@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:todo_app/src/bloc/bloc.dart';
@@ -277,7 +278,7 @@ class _NewTodoScreenState extends State<NewTodoScreen> {
 
         //Add Todo to CloudFireStore
         Todo newTodo = Todo(Uuid().v4().toString(), todo, desciption, todoDate,
-            todoTime, category, priorityValue, "Phnom Penh");
+            todoTime, category, priorityValue, "Phnom Penh", false);
         createTodo(bloc, newTodo);
       },
       textColor: Colors.white,
@@ -288,14 +289,11 @@ class _NewTodoScreenState extends State<NewTodoScreen> {
   }
 
   createTodo(Bloc bloc, Todo todo) async {
-    // Map<String, dynamic> newTodo = todo.toMap();
-    // newTodo['todoDate'] = todo.todoDate.millisecond;
-    // newTodo['todoTime'] = todo.todoTime.minute;
-    print(bloc.userId);
+    FirebaseUser user = await bloc.getUser();
     await Firestore.instance
-        .collection('todos')
-        .document(bloc.userId)
-        .collection("userTodos")
+        .collection('users')
+        .document(user.uid)
+        .collection("todos")
         .add(todo.toMap());
   }
 }

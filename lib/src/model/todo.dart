@@ -10,9 +10,13 @@ class Todo {
   String category;
   int priority;
   String location;
+  bool isDone;
+
+  String documentId;
 
   Todo(this.id, this.todo, this.description, this.todoDate, this.todoTime,
-      this.category, this.priority, this.location);
+      this.category, this.priority, this.location, this.isDone,
+      {this.documentId});
 
   Map<String, dynamic> toMap() => {
         'id': this.id,
@@ -23,10 +27,11 @@ class Todo {
             .millisecondsSinceEpoch,
         'category': category,
         'priority': priority,
-        'location': location
+        'location': location,
+        'isDone': isDone
       };
 
-  Todo.fromMap(Map<String, dynamic> data)
+  Todo.fromMap(Map<String, dynamic> data, String documentId)
       : this(
           data['id'],
           data['todo'],
@@ -37,5 +42,7 @@ class Todo {
           data['category'],
           data['priority'],
           data['location'],
+          data['isDone'],
+          documentId: documentId,
         );
 }

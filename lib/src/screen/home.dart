@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:todo_app/src/bloc/bloc.dart';
@@ -132,32 +131,29 @@ Widget _buildSummeryCard() {
   );
 }
 
-// Widget _buildListTodos(Bloc bloc) {
-//   return StreamBuilder(
-//     stream: bloc.todos,
-//     builder: (BuildContext context, AsyncSnapshot<List<Todo>> snapshot) {
-//       return Expanded(
-//         child: TodoList(
-//           todos: snapshot.data,
-//         ),
-//       );
-//     },
-//   );
-// }
-
-Widget _buildListTodos(Bloc bloc) {
-  var snapshot =
-      Firestore.instance.collection("todos").document(bloc.userId).collection("userTodos").snapshots();
+_buildListTodos(Bloc bloc) {
   return StreamBuilder(
-    stream: snapshot,
+    stream: bloc.getTodos(),
     builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
       List<Todo> todos = List();
-       for (var i = 0; i < snapshot.data.documents.length; i++) {
-         todos.add(Todo.fromMap(snapshot.data.documents[i].data));
-       }
+      if (snapshot.data != null) {
+        for (var i = 0; i < snapshot.data.documents.length; i++) {
+          var document = snapshot.data.documents[i];
+          Todo todo = Todo.fromMap(document.data, document.documentID);
+          todos.add(todo);
+        }
+      }
       return Expanded(
         child: TodoList(
           todos: todos,
+          onTodoSwipeToRight: (Todo todo) {
+            todo.isDone = true;
+            bloc.updateTodo(todo);
+          },
+          onTodoSwipeToLeft: (Todo todo) {
+            todo.isDone = false;
+            bloc.updateTodo(todo);
+          },
         ),
       );
     },
