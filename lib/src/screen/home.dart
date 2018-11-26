@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:todo_app/src/bloc/bloc.dart';
@@ -145,13 +146,15 @@ Widget _buildSummeryCard() {
 // }
 
 Widget _buildListTodos(Bloc bloc) {
+  var snapshot =
+      Firestore.instance.collection("todos").document(bloc.userId).collection("userTodos").snapshots();
   return StreamBuilder(
-    stream: Firestore.instance.collection("todos").snapshots(),
+    stream: snapshot,
     builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
       List<Todo> todos = List();
-      for (var i = 0; i < snapshot.data.documents.length; i++) {
-        todos.add(Todo.fromMap(snapshot.data.documents[i].data));
-      }
+       for (var i = 0; i < snapshot.data.documents.length; i++) {
+         todos.add(Todo.fromMap(snapshot.data.documents[i].data));
+       }
       return Expanded(
         child: TodoList(
           todos: todos,

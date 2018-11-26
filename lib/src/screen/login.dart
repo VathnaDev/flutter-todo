@@ -1,9 +1,17 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:todo_app/src/bloc/bloc.dart';
 import 'package:todo_app/src/bloc/provider.dart';
 import 'package:todo_app/src/screen/home.dart';
+import 'package:todo_app/src/screen/signup.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
+  _LoginScreenState createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  bool isBusy = false;
+
   @override
   Widget build(BuildContext context) {
     Bloc bloc = Provider.of(context);
@@ -23,56 +31,76 @@ class LoginScreen extends StatelessWidget {
             Colors.indigo[400],
           ],
         )),
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              children: <Widget>[
-                Text(
-                  "Welcome To Khmer Todo",
-                  style: TextStyle(
-                      fontFamily: 'Raleway',
-                      fontSize: 26.0,
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 30.0),
-                Text(
-                  "Login",
-                  style: TextStyle(
-                    fontSize: 24.0,
-                    color: Colors.white,
-                    fontFamily: 'Raleway',
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.only(top: 25.0),
+              child: Align(
+                child: LinearProgressIndicator(),
+              ),
+            ),
+            Expanded(
+              child: Center(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    children: <Widget>[
+                      Text(
+                        "Welcome To Khmer Todo",
+                        style: TextStyle(
+                            fontFamily: 'Raleway',
+                            fontSize: 26.0,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(height: 30.0),
+                      Text(
+                        "Login",
+                        style: TextStyle(
+                          fontSize: 24.0,
+                          color: Colors.white,
+                          fontFamily: 'Raleway',
+                        ),
+                      ),
+                      SizedBox(height: 20.0),
+                      _buildEmailInput(bloc),
+                      SizedBox(height: 8.0),
+                      _buildPasswordInput(bloc),
+                      SizedBox(height: 20.0),
+                      _buildSubmitButton(context, bloc),
+                      SizedBox(height: 8.0),
+                      buildRegisterRow(context)
+                    ],
                   ),
                 ),
-                SizedBox(height: 20.0),
-                _buildEmailInput(bloc),
-                SizedBox(height: 8.0),
-                _buildPasswordInput(bloc),
-                SizedBox(height: 20.0),
-                _buildSubmitButton(context, bloc),
-                SizedBox(height: 8.0),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Text(
-                      "Don't have account? ",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    GestureDetector(
-                      onTap: () {},
-                      child: Text(
-                        "Sign up",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    )
-                  ],
-                )
-              ],
+              ),
             ),
-          ),
+          ],
         ),
       ),
+    );
+  }
+
+  Row buildRegisterRow(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        Text(
+          "Don't have account? ",
+          style: TextStyle(color: Colors.white),
+        ),
+        GestureDetector(
+          onTap: () {
+            Navigator.push(context,
+                new MaterialPageRoute(builder: (context) => SignUpScreen()));
+          },
+          child: Text(
+            "Sign up",
+            style: TextStyle(color: Colors.white),
+          ),
+        )
+      ],
     );
   }
 
@@ -136,6 +164,7 @@ class LoginScreen extends StatelessWidget {
               borderRadius: BorderRadius.circular(16.0),
             ),
             textColor: Colors.white,
+            disabledTextColor: Colors.grey,
             child: Text("Login"),
             onPressed: !snapshot.hasData
                 ? null
@@ -147,16 +176,32 @@ class LoginScreen extends StatelessWidget {
       ),
     );
   }
-}
 
-performLogin(Bloc bloc, BuildContext context) {
-  bool isValid = bloc.submit();
-  if (!isValid) {
-    print("Invalid");
-  } else {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => HomeScreen()),
-    );
+  performLogin(Bloc bloc, BuildContext context) async {
+    try {
+      setState(() {
+        isBusy = true;
+      });
+      FirebaseUser user = await bloc.loginUser();
+      if (user != null) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => HomeScreen()),
+        );
+      }
+    } catch (ex) {
+      setState(() {
+        isBusy = false;
+      });
+      Scaffold.of(context).showSnackBar(SnackBar(
+        content: Text("Invalid Username or Password"),
+      ));
+      // showDialog(
+      //     context: context,
+      //     builder: (context) => AlertDialog(
+      //           title: Text("Error"),
+      //           content: Text("Invalid username or password"),
+      //         ));
+    }
   }
 }

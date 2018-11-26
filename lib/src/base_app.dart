@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:todo_app/src/bloc/provider.dart';
 import 'package:todo_app/src/screen/home.dart';
+import 'package:todo_app/src/screen/login.dart';
 
 class BaseApp extends StatelessWidget {
   @override
@@ -8,7 +9,7 @@ class BaseApp extends StatelessWidget {
     return Provider(
       child: MaterialApp(
         theme: getThemeData(),
-        home: HomeScreen(),
+        home: LoginScreen(),
       ),
     );
   }

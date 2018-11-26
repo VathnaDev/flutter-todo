@@ -276,8 +276,9 @@ class _NewTodoScreenState extends State<NewTodoScreen> {
         //     priorityValue, "Phnom Penh"));
 
         //Add Todo to CloudFireStore
-        createTodo(Todo(Uuid().v4().toString(), todo, desciption, todoDate,
-            todoTime, category, priorityValue, "Phnom Penh"));
+        Todo newTodo = Todo(Uuid().v4().toString(), todo, desciption, todoDate,
+            todoTime, category, priorityValue, "Phnom Penh");
+        createTodo(bloc, newTodo);
       },
       textColor: Colors.white,
       color: Theme.of(context).primaryColor,
@@ -286,10 +287,15 @@ class _NewTodoScreenState extends State<NewTodoScreen> {
     );
   }
 
-  createTodo(Todo todo) async {
+  createTodo(Bloc bloc, Todo todo) async {
     // Map<String, dynamic> newTodo = todo.toMap();
     // newTodo['todoDate'] = todo.todoDate.millisecond;
     // newTodo['todoTime'] = todo.todoTime.minute;
-    await Firestore.instance.collection('todos').add(todo.toMap());
+    print(bloc.userId);
+    await Firestore.instance
+        .collection('todos')
+        .document(bloc.userId)
+        .collection("userTodos")
+        .add(todo.toMap());
   }
 }
