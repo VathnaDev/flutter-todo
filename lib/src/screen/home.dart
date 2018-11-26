@@ -5,6 +5,7 @@ import 'package:todo_app/src/bloc/bloc.dart';
 import 'package:todo_app/src/bloc/provider.dart';
 import 'package:todo_app/src/model/todo.dart';
 import 'package:todo_app/src/screen/new_todo.dart';
+import 'package:todo_app/src/screen/todo_detail.dart';
 import 'package:todo_app/src/widget/todo_list.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -146,6 +147,10 @@ _buildListTodos(Bloc bloc) {
       return Expanded(
         child: TodoList(
           todos: todos,
+          onTodoTapped: (Todo todo) {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => TodoDetailScreen(todo)));
+          },
           onTodoSwipeToRight: (Todo todo) {
             todo.isDone = true;
             bloc.updateTodo(todo);
